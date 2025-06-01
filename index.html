@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SDM – Sem Desperdício de Materiais</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+  body {
+    margin: 0; font-family: 'Roboto', sans-serif; background: #f9f9f9; color: #333;
+    -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+  }
+  header {
+    background: #2c3e50; color: white; padding: 1rem;
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap;
+  }
+  header h1 {
+    margin: 0; font-size: 1.5rem;
+    flex: 1 0 200px;
+  }
+  nav {
+    display: flex; gap: 1rem; flex: 1 0 200px; justify-content: flex-end;
+  }
+  nav button {
+    background: transparent; border: none; color: white; font-size: 1rem;
+    cursor: pointer; padding: 0.5rem 1rem; border-radius: 5px;
+    transition: background-color 0.3s ease;
+  }
+  nav button:hover, nav button.active {
+    background: #e67e22;
+  }
+  main {
+    max-width: 960px; margin: 1rem auto; padding: 1rem;
+    background: white; border-radius: 8px; box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+  }
+  section {
+    display: none;
+  }
+  section.active {
+    display: block;
+  }
+
+  h2 {
+    color: #e67e22; margin-bottom: 1rem;
+  }
+  label {
+    display: block; margin-bottom: 0.4rem; font-weight: 700;
+    color: #34495e;
+  }
+  input[type=text], input[type=number], input[type=date], select, textarea {
+    width: 100%; padding: 0.5rem; margin-bottom: 1rem; border: 1px solid #ccc; border-radius: 5px;
+    font-size: 1rem; box-sizing: border-box;
+  }
+
+  input[type=file] {
+    margin-bottom: 1rem;
+  }
+
+  button.primary {
+    background-color: #e67e22; border: none; color: white;
+    padding: 0.75rem 1.5rem; font-size: 1rem; font-weight: 700;
+    border-radius: 5px; cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  button.primary:hover {
+    background-color: #d35400;
+  }
+  button[disabled] {
+    background-color: #bdc3c7 !important; cursor: not-allowed;
+  }
+
+  table {
+    width: 100%; border-collapse: collapse; margin-top: 1rem;
+  }
+  th, td {
+    padding: 0.75rem; border-bottom: 1px solid #ddd; text-align: left;
+  }
+  th {
+    background: #ecf0f1;
+  }
+
+  .alert {
+    background: #f39c12; color: white; padding: 0.75rem 1rem;
+    margin: 1rem 0; border-radius: 5px;
+    font-weight: 700; font-size: 1rem;
+  }
+
+  .small-icon {
+    width: 24px; height: 24px; vertical-align: middle; margin-right: 6px;
+    fill: #e67e22;
+  }
+
+  /* Responsive and mobile first */
+  @media (max-width: 600px) {
+    nav {
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    nav button {
+      flex: 1 1 45%;
+      margin: 0.25rem 0;
+    }
+    header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+    table, thead, tbody, th, td, tr {
+      display: block;
+    }
+    tr {
+      margin-bottom: 1rem;
+      border-bottom: 2px solid #ecf0f1;
+    }
+    td {
+      padding-left: 50%;
+      position: relative;
+      text-align: right;
+    }
+    td:before {
+      position: absolute;
+      top: 0.75rem;
+      left: 0.75rem;
+      width: 45%;
+      white-space: nowrap;
+      font-weight: 700;
+      text-align: left;
+      color: #34495e;
+    }
+    /* labels for each td */
+    td:nth-of-type(1):before { content: "Nome"; }
+    td:nth-of-type(2):before { content: "Quantidade"; }
+    td:nth-of-type(3):before { content: "Data"; }
+    td:nth-of-type(4):before { content: "Responsável"; }
+    td:nth-of-type(5):before { content: "Local/Obs"; }
+  }
+
+  /* Large icons for better click target */
+  .icon-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 700;
+    font-size: 1.1rem;
+    cursor: pointer;
+  }
+
+  /* User role badge */
+  .user-role {
+    background: #e67e22;
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    user-select: none;
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>SDM – Sem Desperdício de Materiais</h1>
+  <nav>
+    <button id="nav-cadastro" class="active" title="Cadastro de Materiais" aria-label="Cadastro de Materiais">
+      📥 Cadastro
+    </button>
+    <button id="nav-uso" title="Registro de Uso" aria-label="Registro de Uso">
+      🛠 Uso
+    </button>
+    <button id="nav-estoque" title="Estoque Atualizado" aria-label="Estoque Atualizado">
+      📦 Estoque
+    </button>
+    <button id="nav-relatorios" title="Relatórios" aria-label="Relatórios">
+      📊 Relatórios
+    </button>
+    <button id="nav-config" title="Configurações" aria-label="Configurações">
+      ⚙ Config
+    </button>
+  </nav>
+</header>
+<main>
+  <section id="cadastro-section" class="active" aria-label="Cadastro de Materiais">
+    <h2>Cadastro de Materiais</h2>
+    <form id="form-cadastro">
+      <label for="material-nome">Nome do Material</label>
+      <input type="text" id="material-nome" name="nome" required maxlength="50" placeholder="Ex: Cimento" />
+
+      <label for="material-foto">Foto do Material</label>
+      <input type="file" id="material-foto" name="foto" accept="image/*" />
+
+      <label for="material-quantidade">Quantidade Recebida</label>
+      <input type="number" id="material-quantidade" name="quantidade" required min="1" placeholder="Ex: 100" />
+
+      <label for="material-data">Data de Entrada</label>
+      <input type="date" id="material-data" name="dataEntrada" required />
+
+      <label for="material-responsavel">Responsável pelo Recebimento</label>
+      <input type="text" id="material-responsavel" name="responsavelEntrada" required placeholder="Nome do responsável" maxlength="50" />
+
+      <label for="material-local">Local da Obra</label>
+      <input type="text" id="material-local" name="localObra" required placeholder="Ex: Obra Centro" maxlength="100" />
+
+      <button type="submit" class="primary icon-button">➕ Cadastrar Material</button>
+    </form>
+  </section>
+
+  <section id="uso-section" aria-label="Registro de Uso de Materiais">
+    <h2>Registro de Uso de Materiais</h2>
+    <form id="form-uso">
+      <label for="uso-material">Material</label>
+      <select id="uso-material" name="material" required>
+        <option value="">Selecione um material</option>
+      </select>
+
+      <label for="uso-quantidade">Quantidade Usada</label>
+      <input type="number" id="uso-quantidade" name="quantidade" required min="1" placeholder="Ex: 20" />
+
+      <label for="uso-local">Onde Foi Usado</label>
+      <input type="text" id="uso-local" name="local" required placeholder="Local ou atividade" maxlength="100" />
+
+      <label for="uso-responsavel">Responsável pelo Uso</label>
+      <input type="text" id="uso-responsavel" name="responsavel" required maxlength="50" placeholder="Nome do responsável" />
+
+      <label for="uso-data">Data de Uso</label>
+      <input type="date" id="uso-data" name="dataUso" required />
+
+      <button type="submit" class="primary icon-button">✅ Registrar Uso</button>
+    </form>
+  </section>
+
+  <section id="estoque-section" aria-label="Estoque Atualizado">
+    <h2>Estoque Atualizado</h2>
+    <div id="alert-baixa-quantidade" aria-live="polite" class="alert" style="display:none;"></div>
+    <table aria-label="Tabela de materiais em estoque">
+      <thead>
+        <tr>
+          <th>Material</th>
+          <th>Quantidade Disponível</th>
+          <th>Local da Obra</th>
+          <th>Última Entrada</th>
+          <th>Último Uso</th>
+        </tr>
+      </thead>
+      <tbody id="estoque-tbody">
+      </tbody>
+    </table>
+    <h3>Histórico de Entrada e Saída</h3>
+    <table aria-label="Histórico de entradas e saídas">
+      <thead>
+        <tr>
+          <th>Material</th>
+          <th>Tipo</th>
+          <th>Quantidade</th>
+          <th>Data</th>
+          <th>Responsável</th>
+          <th>Local/Obs</th>
+        </tr>
+      </thead>
+      <tbody id="historico-tbody">
+      </tbody>
+    </table>
+  </section>
+
+  <section id="relatorios-section" aria-label="Relatórios simples">
+    <h2>Relatórios</h2>
+    <button id="exportar-pdf" class="primary icon-button" title="Exportar Relatórios em PDF">📄 Exportar em PDF</button>
+
+    <h3>Resumo do Uso Semanal</h3>
+    <div id="relatorio-semanal"></div>
+
+    <h3>Materiais Mais Desperdiçados</h3>
+    <div id="relatorio-desperdicio"></div>
+
+    <h3>Comparação entre Entrada e Uso</h3>
+    <div id="relatorio-comparacao"></div>
+  </section>
+
+  <section id="config-section" aria-label="Configurações do Usuário">
+    <h2>Configurações</h2>
+    <label for="usuario-role">Selecione o Perfil do Usuário:</label>
+    <select id="usuario-role">
+      <option value="administrador">Administrador (Engenheiro/Gestor)</option>
+      <option value="encarregado">Encarregado da Obra</option>
+      <option value="ajudante">Ajudante/Colaborador</option>
+    </select>
+    <p>Perfil atual: <span id="perfil-atual">Administrador</span></p>
+  </section>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+  (function(){
+    const STORAGE_MATERIAIS = 'sdm_materiais';
+    const STORAGE_USOS = 'sdm_usos';
+    const STORAGE_USER_ROLE = 'sdm_user_role';
+
+    // Element refs
+    const sections = {
+      cadastro: document.getElementById('cadastro-section'),
+      uso: document.getElementById('uso-section'),
+      estoque: document.getElementById('estoque-section'),
+      relatorios: document.getElementById('relatorios-section'),
+      config: document.getElementById('config-section'),
+    };
+
+    const navButtons = {
+      cadastro: document.getElementById('nav-cadastro'),
+      uso: document.getElementById('nav-uso'),
+      estoque: document.getElementById('nav-estoque'),
+      relatorios: document.getElementById('nav-relatorios'),
+      config: document.getElementById('nav-config'),
+    };
+
+    const formCadastro = document.getElementById('form-cadastro');
+    const formUso = document.getElementById('form-uso');
+    const selectUsoMaterial = document.getElementById('uso-material');
+
+    const estoqueTBody = document.getElementById('estoque-tbody');
+    const historicoTBody = document.getElementById('historico-tbody');
+    const alertBaixaQuantidade = document.getElementById('alert-baixa-quantidade');
+
+    const resumoSemanalDiv = document.getElementById('relatorio-semanal');
+    const materiaisDesperdicioDiv = document.getElementById('relatorio-desperdicio');
+    const comparacaoDiv = document.getElementById('relatorio-comparacao');
+    const exportarPdfBtn = document.getElementById('exportar-pdf');
+
+    const usuarioRoleSelect = document.getElementById('usuario-role');
+    const perfilAtualSpan = document.getElementById('perfil-atual');
+
+    // Data structures
+    let materiais = [];
+    let usos = [];
+    let userRole = 'administrador';
+
+    // Utils
+    function saveToStorage() {
+      localStorage.setItem(STORAGE_MATERIAIS, JSON.stringify(materiais));
+      localStorage.setItem(STORAGE_USOS, JSON.stringify(usos));
+      localStorage.setItem(STORAGE_USER_ROLE, userRole);
+    }
+
+    function loadFromStorage() {
+      const m = localStorage.getItem(STORAGE_MATERIAIS);
+      const u = localStorage.getItem(STORAGE_USOS);
+      const r = localStorage.getItem(STORAGE_USER_ROLE);
+      if (m) materiais = JSON.parse(m);
+      if (u) usos = JSON.parse(u);
+      if (r) userRole = r;
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return '';
+      const d = new Date(dateStr);
+      if (isNaN(d)) return '';
+      return d.toLocaleDateString('pt-BR');
+    }
+
+    function getTodayISO() {
+      return new Date().toISOString().slice(0,10);
+    }
+
+    // Navigation UI control
+    function setActiveSection(name) {
+      for (const sec in sections) {
+        sections[sec].classList.toggle('active', sec === name);
+        navButtons[sec].classList.toggle('active', sec === name);
+      }
+    }
+
+    // Load usage materials options for <select>
+    function populateUsoMaterialOptions() {
+      selectUsoMaterial.innerHTML = '<option value="">Selecione um material</option>';
+      materiais.forEach(m => {
+        selectUsoMaterial.innerHTML += `<option value="${m.id}">${m.nome}</option>`;
+      });
+    }
+
+    // Generate unique ID for materials and uses
+    function generateId() {
+      return Date.now().toString(36) + Math.random().toString(36).slice(2);
+    }
+
+    // Image to base64 conversion for preview and storage
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // Alerts for low quantity
+    function checkLowStock() {
+      const ALERT_LIMIT = 20; // configurable, show alert if any material has quantity below this
+      const lowStockMaterials = materiais.filter(m => m.quantidadeDisponivel <= ALERT_LIMIT);
+      if(lowStockMaterials.length > 0) {
+        alertBaixaQuantidade.innerHTML = '⚠️ Atenção! Quantidade baixa para: ' + lowStockMaterials.map(m => m.nome).join(', ');
+        alertBaixaQuantidade.style.display = 'block';
+      } else {
+        alertBaixaQuantidade.style.display = 'none';
+      }
+    }
+
+    // Update estoque table and histórico
+    function refreshEstoqueAndHistorico() {
+      // Estoque - show current stocks summarizing entradas - usos
+      estoqueTBody.innerHTML = '';
+      materiais.forEach(m => {
+        // filter last entrada and last uso dates
+        const entradas = usos.filter(u => u.tipo === 'entrada' && u.materialId === m.id);
+        const usosHist = usos.filter(u => u.tipo === 'uso' && u.materialId === m.id);
+        const lastEntrada = entradas.length ? entradas.reduce((a,b) => a.data > b.data ? a : b).data : '';
+        const lastUso = usosHist.length ? usosHist.reduce((a,b) => a.data > b.data ? a : b).data : '';
+
+        estoqueTBody.innerHTML += `
+          <tr>
+            <td>${m.nome}</td>
+            <td>${m.quantidadeDisponivel}</td>
+            <td>${m.localObra}</td>
+            <td>${formatDate(lastEntrada)}</td>
+            <td>${formatDate(lastUso)}</td>
+          </tr>
+        `;
+      });
+
+      // Histórico - mostrar todas entradas e usos ordenados por data decrescente
+      const sortedHistorico = usos.slice().sort((a,b) => new Date(b.data) - new Date(a.data));
+      historicoTBody.innerHTML = '';
+      sortedHistorico.forEach(r => {
+        const mat = materiais.find(m => m.id === r.materialId);
+        if(!mat) return;
+        historicoTBody.innerHTML += `
+          <tr>
+            <td>${mat.nome}</td>
+            <td>${r.tipo === 'entrada' ? 'Entrada' : 'Uso'}</td>
+            <td>${r.quantidade}</td>
+            <td>${formatDate(r.data)}</td>
+            <td>${r.responsavel}</td>
+            <td>${r.local}</td>
+          </tr>
+        `;
+      });
+      checkLowStock();
+    }
+
+    // Calcula quantidade disponível de cada material
+    function atualizarQuantidadesDisponiveis() {
+      materiais.forEach(m => {
+        const entradaTotal = usos
+          .filter(u => u.materialId === m.id && u.tipo === 'entrada')
+          .reduce((sum,u) => sum + u.quantidade,0);
+        const usoTotal = usos
+          .filter(u => u.materialId === m.id && u.tipo === 'uso')
+          .reduce((sum,u) => sum + u.quantidade,0);
+        m.quantidadeDisponivel = entradaTotal - usoTotal;
+        if(m.quantidadeDisponivel < 0) m.quantidadeDisponivel = 0;
+      });
+    }
+
+    // Restrição de acesso simples por perfil de usuário
+    function atualizarPermissoes() {
+      // administrador: acesso total
+      // encarregado: pode registrar uso e ver estoque e relatórios, não pode cadastrar materiais
+      // ajudante: pode só registrar uso e ver estoque
+      if(userRole === 'administrador') {
+        enableElement(formCadastro, true);
+        enableElement(formUso, true);
+        navButtons.cadastro.disabled = false;
+        exportarPdfBtn.disabled = false;
+      } else if (userRole === 'encarregado') {
+        enableElement(formCadastro, false);
+        enableElement(formUso, true);
+        navButtons.cadastro.disabled = true;
+        exportarPdfBtn.disabled = false;
+      } else { // ajudante
+        enableElement(formCadastro, false);
+        enableElement(formUso, true);
+        navButtons.cadastro.disabled = true;
+        exportarPdfBtn.disabled = true;
+      }
+      perfilAtualSpan.textContent = userRole.charAt(0).toUpperCase() + userRole.slice(1);
+    }
+
+    function enableElement(element, enable) {
+      if(!element) return;
+      Array.from(element.elements || []).forEach(i => i.disabled = !enable);
+      if(element.tagName === 'FORM') {
+        const submitbtn = element.querySelector('button[type="submit"]');
+        if(submitbtn) submitbtn.disabled = !enable;
+      }
+      if(element.tagName === 'BUTTON') {
+        element.disabled = !enable;
+      }
+    }
+
+    // Relatórios
+
+    // 1) Resumo do que foi usado por semana
+    function gerarRelatorioSemanal() {
+      // Agrupar usos por semana - mostra o total usado de cada material por semana (ISO semana)
+      const semanal = {};
+      usos.filter(u => u.tipo==='uso').forEach(u => {
+        const dateObj = new Date(u.data);
+        if(isNaN(dateObj)) return;
+        const year = dateObj.getFullYear();
+        // get week number (ISO week date)
+        const week = getWeekNumber(dateObj);
+        const key = `${year}-W${week}`;
+        if(!semanal[key]) semanal[key] = {};
+        if(!semanal[key][u.materialId]) semanal[key][u.materialId] = 0;
+        semanal[key][u.materialId] += u.quantidade;
+      });
+
+      let html = '<table><thead><tr><th>Semana</th><th>Material</th><th>Quantidade Usada</th></tr></thead><tbody>';
+      Object.entries(semanal).forEach(([sem,data]) => {
+        Object.entries(data).forEach(([matId, q]) => {
+          const mat = materiais.find(m => m.id === matId);
+          if(!mat) return;
+          html += `<tr><td>${sem}</td><td>${mat.nome}</td><td>${q}</td></tr>`;
+        });
+      });
+      html += '</tbody></table>';
+      resumoSemanalDiv.innerHTML = html;
+    }
+    function getWeekNumber(d) {
+      // Copy date so don't modify original
+      d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+      // Set to nearest Thursday: current date + 4 - current day number
+      // (Monday is 1, Sunday is 7)
+      var dayNum = d.getUTCDay() || 7;
+      d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+      // Get first day of year
+      var yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+      // Calculate full weeks to nearest Thursday
+      var weekNo = Math.ceil((((d - yearStart) / 86400000) + 1)/7);
+      return weekNo;
+    }
+
+    // 2) Materiais mais desperdiçados
+    // Aqui considerado desperdício como uso acima do estoque disponível (excesso não necessariamente pode ser detectado facilmente)
+    // Alternativa simples: usamos comparação entre entrada e uso, materiais onde a diferença é muito negativa ou consideramos grandes perdas.
+    function gerarRelatorioDesperdicio() {
+      // Para simplificar: calcula perda = entrada - uso; se perda negativa, considera desperdício
+      const desperdicios = materiais.map(m => {
+        const entradas = usos.filter(u => u.materialId===m.id && u.tipo==='entrada')
+          .reduce((sum,u) => sum + u.quantidade,0);
+        const uso = usos.filter(u => u.materialId===m.id && u.tipo==='uso')
+          .reduce((sum,u) => sum + u.quantidade,0);
+        const perda = entradas - uso;
+        return { nome: m.nome, perda };
+      }).filter(d => d.perda < 0)
+      .sort((a,b) => a.perda - b.perda); // mais negativo primeiro
+
+      if(desperdicios.length === 0) {
+        materiaisDesperdicioDiv.innerHTML = '<p>Nenhum desperdício detectado.</p>';
+        return;
+      }
+
+      let html = '<ul>';
+      desperdicios.forEach(d => {
+        html += `<li>${d.nome}: perda estimada de ${Math.abs(d.perda).toFixed(2)}</li>`;
+      });
+      html += '</ul>';
+      materiaisDesperdicioDiv.innerHTML = html;
+    }
+
+    // 3) Comparação entre entrada e uso
+    function gerarRelatorioComparacao() {
+      let html = '<table><thead><tr><th>Material</th><th>Total Entrada</th><th>Total Uso</th><th>Saldo</th></tr></thead><tbody>';
+      materiais.forEach(m => {
+        const entrada = usos.filter(u => u.tipo==='entrada' && u.materialId===m.id)
+          .reduce((sum,u) => sum + u.quantidade,0);
+        const uso = usos.filter(u => u.tipo==='uso' && u.materialId===m.id)
+          .reduce((sum,u) => sum + u.quantidade,0);
+        const saldo = entrada - uso;
+        html += `<tr>
+          <td>${m.nome}</td>
+          <td>${entrada}</td>
+          <td>${uso}</td>
+          <td>${saldo}</td>
+        </tr>`;
+      });
+      html += '</tbody></table>';
+      comparacaoDiv.innerHTML = html;
+    }
+
+    // Exportar relatório em PDF usando jsPDF
+    async function exportarPdfRelatorios() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      // Título
+      doc.setFontSize(18);
+      doc.text('Relatórios SDM – Sem Desperdício de Materiais', 10, 20);
+
+      // Resumo Semanal
+      doc.setFontSize(14);
+      doc.text('Resumo do Uso Semanal:', 10, 30);
+      let y = 36;
+      const rowsSemanal = [];
+      usos.filter(u => u.tipo === 'uso').forEach(u => {
+        // Vamos agrupar por semana e material
+      });
+
+      // Gerar tabela resumida semanal (mesmo que na interface)
+      // Para simplicidade exportar o HTML das tabelas visíveis
+      // (jsPDF não tem suporte direto a tabelas complexas, usaremos texto simples)
+      // Export resumido: Material, Semana, Quantidade usada
+      let semanal = {};
+      usos.filter(u => u.tipo==='uso').forEach(u => {
+        const dateObj = new Date(u.data);
+        if(isNaN(dateObj)) return;
+        const year = dateObj.getFullYear();
+        const week = getWeekNumber(dateObj);
+        const key = `${year}-W${week}`;
+        if(!semanal[key]) semanal[key] = {};
+        if(!semanal[key][u.materialId]) semanal[key][u.materialId] = 0;
+        semanal[key][u.materialId] += u.quantidade;
+      });
+      const maxRowsPerPage = 20;
+
+      // Print resumo semanal
+      let lineCount = 0;
+      doc.setFontSize(11);
+      for(const [sem, data] of Object.entries(semanal)) {
+        for(const [matId, q] of Object.entries(data)) {
+          const mat = materiais.find(m => m.id === matId);
+          if(!mat) continue;
+          if(lineCount >= maxRowsPerPage) {
+            doc.addPage();
+            lineCount = 0;
+          }
+          doc.text(`${sem} - ${mat.nome} : ${q}`, 10, 40 + lineCount*7);
+          lineCount++;
+        }
+      }
+      y += lineCount * 7 + 10;
+
+      // Materiais mais desperdiçados
+      doc.addPage();
+      doc.setFontSize(14);
+      doc.text('Materiais Mais Desperdiçados:', 10, 20);
+      doc.setFontSize(11);
+      let desperdicios = materiais.map(m => {
+        const entradas = usos.filter(u => u.materialId===m.id && u.tipo==='entrada')
+          .reduce((sum,u) => sum + u.quantidade,0);
+        const uso = usos.filter(u => u.materialId===m.id && u.tipo==='uso')
+          .reduce((sum,u) => sum + u.quantidade,0);
+        const perda = entradas - uso;
+        return { nome: m.nome, perda };
+      }).filter(d => d.perda < 0)
+      .sort((a,b) => a.perda - b.perda);
+      if(desperdicios.length === 0) {
+        doc.text('Nenhum desperdício detectado.', 10, 30);
+      } else {
+        desperdicios.forEach((d,i) => {
+          if(i >= maxRowsPerPage) return;
+          doc.text(`${d.nome}: perda estimada de ${Math.abs(d.perda).toFixed(2)}`, 10, 30 + i*7);
+        });
+      }
+
+      // Comparação entrada e uso
+      doc.addPage();
+      doc.setFontSize(14);
+      doc.text('Comparação entre Entrada e Uso:', 10, 20);
+      doc.setFontSize(11);
+      materiais.forEach((m,i) => {
+        if(i >= maxRowsPerPage) return;
+        const entrada = usos.filter(u => u.tipo==='entrada' && u.materialId===m.id)
+          .reduce((sum,u) => sum + u.quantidade,0);
+        const uso = usos.filter(u => u.tipo==='uso' && u.materialId===m.id)
+          .reduce((sum,u) => sum + u.quantidade,0);
+        const saldo = entrada - uso;
+        const line = `${m.nome} - Entrada: ${entrada}, Uso: ${uso}, Saldo: ${saldo}`;
+        doc.text(line, 10, 30 + i*7);
+      });
+
+      doc.save('Relatorios_SDM.pdf');
+    }
+
+    // Event Listeners
+
+    // Navegação
+    Object.entries(navButtons).forEach(([key, btn]) => {
+      btn.addEventListener('click', () => setActiveSection(key));
+    });
+
+    // Inicializar campos de data com hoje para cadastro e uso
+    document.getElementById('material-data').value = getTodayISO();
+    document.getElementById('uso-data').value = getTodayISO();
+
+    // Formulario cadastro
+    formCadastro.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if(userRole !== 'administrador') {
+        alert('Você não tem permissão para cadastrar materiais.');
+        return;
+      }
+
+      const nome = formCadastro.nome.value.trim();
+      const quantidade = parseInt(formCadastro.quantidade.value);
+      const dataEntrada = formCadastro.dataEntrada.value;
+      const responsavelEntrada = formCadastro.responsavelEntrada.value.trim();
+      const localObra = formCadastro.localObra.value.trim();
+
+      // Foto base64 encode
+      let fotoBase64 = '';
+      if(formCadastro.foto.files.length > 0) {
+        try {
+          fotoBase64 = await fileToBase64(formCadastro.foto.files[0]);
+        } catch {
+          alert('Falha ao processar a foto.');
+          return;
+        }
+      }
+
+      if(!nome || !quantidade || !dataEntrada || !responsavelEntrada || !localObra) {
+        alert('Preencha todos os campos obrigatórios corretamente.');
+        return;
+      }
+
+      // Criar material
+      const materialId = generateId();
+      const material = {
+        id: materialId,
+        nome,
+        foto: fotoBase64,
+        localObra,
+        quantidadeDisponivel: 0, // será recalculada
+      };
+
+      materiais.push(material);
+
+      // Criar registro de entrada no histórico de usos com tipo 'entrada'
+      usos.push({
+        id: generateId(),
+        materialId,
+        tipo: 'entrada',
+        quantidade,
+        data: dataEntrada,
+        responsavel: responsavelEntrada,
+        local: localObra,
+      });
+
+      atualizarQuantidadesDisponiveis();
+      saveToStorage();
+      populateUsoMaterialOptions();
+      refreshEstoqueAndHistorico();
+      gerarRelatorioSemanal();
+      gerarRelatorioDesperdicio();
+      gerarRelatorioComparacao();
+      formCadastro.reset();
+      document.getElementById('material-data').value = getTodayISO();
+      alert('Material cadastrado com sucesso!');
+    });
+
+    // Formulario uso
+    formUso.addEventListener('submit', e => {
+      e.preventDefault();
+      if(userRole === 'ajudante' || userRole === 'encarregado' || userRole === 'administrador') {
+        const materialId = formUso.material.value;
+        const quantidade = parseInt(formUso.quantidade.value);
+        const local = formUso.local.value.trim();
+        const responsavel = formUso.responsavel.value.trim();
+        const data = formUso.dataUso.value;
+
+        if(!materialId || !quantidade || !local || !responsavel || !data) {
+          alert('Preencha todos os campos corretamente.');
+          return;
+        }
+
+        // Verificar se há material suficiente no estoque (não bloqueia uso, só alerta)
+        const material = materiais.find(m => m.id === materialId);
+        if(!material) {
+          alert('Material inválido.');
+          return;
+        }
+
+        if(quantidade > material.quantidadeDisponivel) {
+          if(!confirm(`Quantidade usada maior que o estoque disponível (${material.quantidadeDisponivel}). Confirmar registro?`)) {
+            return;
+          }
+        }
+
+        usos.push({
+          id: generateId(),
+          materialId,
+          tipo: 'uso',
+          quantidade,
+          data,
+          responsavel,
+          local,
+        });
+
+        atualizarQuantidadesDisponiveis();
+        saveToStorage();
+        refreshEstoqueAndHistorico();
+        gerarRelatorioSemanal();
+        gerarRelatorioDesperdicio();
+        gerarRelatorioComparacao();
+        formUso.reset();
+        document.getElementById('uso-data').value = getTodayISO();
+        alert('Uso registrado com sucesso!');
+      } else {
+        alert('Você não tem permissão para registrar uso.');
+      }
+    });
+
+    usuarioRoleSelect.addEventListener('change', (e) => {
+      userRole = e.target.value;
+      saveToStorage();
+      atualizarPermissoes();
+    });
+
+    exportarPdfBtn.addEventListener('click', () => exportarPdfRelatorios());
+
+    // Inicialização
+    function init() {
+      loadFromStorage();
+      populateUsoMaterialOptions();
+      atualizarQuantidadesDisponiveis();
+      refreshEstoqueAndHistorico();
+      gerarRelatorioSemanal();
+      gerarRelatorioDesperdicio();
+      gerarRelatorioComparacao();
+      atualizarPermissoes();
+      usuarioRoleSelect.value = userRole;
+    }
+
+    init();
+
+  })();
+</script>
+</body>
+</html>
+
