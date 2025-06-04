@@ -413,16 +413,42 @@
   <h2>Calculadora de Materiais</h2>
   <form id="form-calculo">
     <label for="calc-area">Área da Obra (em m²)</label>
-    <input type="number" id="calc-area" name="area" min="1" required placeholder="Ex: 50">
+    <input type="number" id="calc-area" name="area" min="1" required placeholder="Ex: 70">
 
-    <label for="calc-material">Nome do Material</label>
-<input type="text" id="calc-material" name="material" required placeholder="Digite o nome, ex: cimento">
+    <label for="tipo-construcao">Tipo de Construção</label>
+    <select id="tipo-construcao" name="tipo-construcao" required>
+      <option value="casa">Casa Residencial</option>
+      <option value="muro">Muro</option>
+      <option value="galpao">Galpão</option>
+    </select>
 
+    <label for="pavimentos">Número de Pavimentos</label>
+    <input type="text" id="pavimentos" name="pavimentos" placeholder="Ex: térreo, 2 andares">
+
+    <label for="fundacao">Tipo de Fundação</label>
+    <input type="text" id="fundacao" name="fundacao" placeholder="Ex: sapata, radier">
+
+    <label for="inclui">Vai incluir (separe por vírgulas)</label>
+    <input type="text" id="inclui" name="inclui" placeholder="Ex: laje, reboco, revestimento">
+
+    <label for="tipo-bloco">Tipo de Bloco/Tijolo</label>
+    <input type="text" id="tipo-bloco" name="tipo-bloco" placeholder="Ex: bloco de concreto">
+
+    <label for="concreto-armado">Vai usar Concreto Armado?</label>
+    <select id="concreto-armado" name="concreto-armado">
+      <option value="sim">Sim</option>
+      <option value="nao">Não</option>
+    </select>
+
+    <label for="observacoes">Outras Observações</label>
+    <input type="text" id="observacoes" name="observacoes" placeholder="Ex: muro de 20m, piscina">
 
     <button type="submit" class="primary">📏 Calcular</button>
   </form>
-  <div id="calc-resultado" class="alert" style="display:none; margin-top:1rem;"></div>
+
+  <div id="calc-resultado" class="alert" style="display:none; margin-top:1 rem;"></div>
 </section>
+
 
     </main>
   </div>
