@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -88,9 +89,9 @@
     box-shadow: 0 6px 12px rgba(211,84,0,0.8);
   }
 
-  /* Container principal apartir do login */
+  /* Container principal após o login */
   #main-app {
-    display: flex;
+    display: none; /* Inicialmente oculto */
     flex-direction: row;
     height: 100%;
     width: 100%;
@@ -250,18 +251,8 @@
     scroll-behavior: smooth;
   }
 </style>
-<style id="monica-reading-highlight-style">
-        .monica-reading-highlight {
-          animation: fadeInOut 1.5s ease-in-out;
-        }
-
-        @keyframes fadeInOut {
-          0%, 100% { background-color: transparent; }
-          30%, 70% { background-color: rgba(2, 118, 255, 0.20); }
-        }
-      </style>
 </head>
-<body monica-id="ofpnmcalabcbjgholdjcjblkibolbppb" monica-version="7.9.4">
+<body>
 <div id="app-container">
 
   <!-- Tela de entrada / login -->
@@ -275,7 +266,7 @@
   </div>
 
   <!-- Aplicativo principal após login -->
-  <div id="main-app" style="display:none;">
+  <div id="main-app">
     <!-- Menu lateral -->
     <nav id="side-menu" aria-label="Menu Principal">
       <button id="btn-cadastro" class="active" aria-controls="cadastro-section" aria-selected="true" role="tab" tabindex="0" title="Cadastro de Materiais">
@@ -429,4 +420,16 @@
   </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+  (function(){
+    const STORAGE_MATERIAIS = 'sdm_materiais';
+    const STORAGE_USOS = 'sdm_usos';
+    const STORAGE_USER_ROLE = 'sdm_user_role';
+
+    // Element refs
+    const loginScreen = document.getElementById('login-screen');
+    const btnLogin = document.getElementById('btn-login');
+    const mainApp = document.getElementById('main-app');
+
+    const sideMenu = document.getElementById('
