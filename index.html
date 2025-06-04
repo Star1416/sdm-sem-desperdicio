@@ -1,0 +1,992 @@
+<html lang="pt-BR"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>SDM – Sem Desperdício de Materiais</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+  /* Reset e corpo */
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0; font-family: 'Roboto', sans-serif; background: #f9f9f9; color: #333;
+    -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+    display: flex; justify-content: center; align-items: center;
+    height: 100vh;
+  }
+
+  /* Container simulando tela celular */
+  #app-container {
+    display: flex;
+    flex-direction: column;
+    height: 90vh;
+    width: 380px;
+    max-width: 100vw;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    overflow: hidden;
+  }
+
+  /* Tela de entrada */
+  #login-screen {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    background: linear-gradient(135deg, #34495e, #e67e22);
+    color: white;
+    position: relative;
+  }
+  #login-screen .logo-container {
+    background: white;
+    border-radius: 50%;
+    width: 140px;
+    height: 140px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 2rem;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+  }
+  #login-screen .logo-text {
+    font-size: 3.5rem;
+    font-weight: 900;
+    background: linear-gradient(45deg, #e67e22, #2980b9);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    user-select: none;
+  }
+  #login-screen h1 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+  }
+  #login-screen p {
+    margin-top: 0; font-size: 1.2rem; margin-bottom: 2.5rem;
+    color: rgba(255,255,255,0.85);
+    font-weight: 600;
+  }
+  #btn-login {
+    background-color: white;
+    border: none;
+    color: #e67e22;
+    padding: 1rem 3rem;
+    font-size: 1.3rem;
+    border-radius: 30px;
+    cursor: pointer;
+    font-weight: 900;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    box-shadow: 0 4px 8px rgba(230,126,34,0.6);
+  }
+  #btn-login:hover {
+    background-color: #d35400;
+    color: white;
+    box-shadow: 0 6px 12px rgba(211,84,0,0.8);
+  }
+
+  /* Container principal apartir do login */
+  #main-app {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    width: 100%;
+  }
+
+  /* Menu lateral estilo celular */
+  #side-menu {
+    width: 90px;
+    background: #2c3e50;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 1rem;
+    user-select: none;
+  }
+
+  #side-menu button {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 1.3rem;
+    margin: 1rem 0;
+    padding: 0.25rem;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    width: 100%;
+    transition: background-color 0.3s ease;
+    border-left: 4px solid transparent;
+  }
+  #side-menu button span {
+    font-size: 0.75rem;
+    white-space: nowrap;
+  }
+  #side-menu button:hover,
+  #side-menu button.active {
+    background-color: #e67e22;
+    color: white;
+    border-left-color: white;
+  }
+
+  /* Conteúdo principal - área das telas */
+  #content-container {
+    flex-grow: 1;
+    padding: 1rem 1.5rem;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #e67e22 #f0f0f0;
+  }
+  #content-container::-webkit-scrollbar {
+    width: 6px;
+  }
+  #content-container::-webkit-scrollbar-thumb {
+    background-color: #e67e22;
+    border-radius: 3px;
+  }
+  #content-container::-webkit-scrollbar-track {
+    background-color: #f0f0f0;
+  }
+
+  h2 {
+    color: #e67e22; margin-bottom: 1rem; font-size: 1.6rem;
+  }
+  label {
+    display: block; margin-bottom: 0.3rem; font-weight: 700;
+    color: #34495e;
+    font-size: 0.9rem;
+  }
+  input[type=text], input[type=number], input[type=date], select, textarea {
+    width: 100%; padding: 0.55rem; margin-bottom: 1rem; border: 1px solid #ccc; border-radius: 7px;
+    font-size: 1rem; box-sizing: border-box;
+    font-family: 'Roboto', sans-serif;
+  }
+
+  input[type=file] {
+    margin-bottom: 1rem;
+  }
+
+  button.primary {
+    background-color: #e67e22; border: none; color: white;
+    padding: 0.8rem 1.6rem; font-size: 1.1rem; font-weight: 700;
+    border-radius: 30px; cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  button.primary:hover {
+    background-color: #d35400;
+  }
+  button[disabled] {
+    background-color: #bdc3c7 !important; cursor: not-allowed;
+  }
+
+  table {
+    width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.9rem;
+  }
+  th, td {
+    padding: 0.55rem; border-bottom: 1px solid #ddd; text-align: left;
+  }
+  th {
+    background: #ecf0f1;
+  }
+
+  .alert {
+    background: #f39c12; color: white; padding: 0.75rem 1rem;
+    margin: 1rem 0; border-radius: 7px;
+    font-weight: 700; font-size: 1rem;
+  }
+
+  /* Navegação interna (aba) */
+  section {
+    display: none;
+  }
+  section.active {
+    display: block;
+  }
+
+  /* Responsive table mobile */
+  @media (max-width: 380px) {
+    table, thead, tbody, th, td, tr {
+      display: block;
+    }
+    tr {
+      margin-bottom: 0.8rem;
+      border-bottom: 2px solid #ecf0f1;
+    }
+    td {
+      padding-left: 50%;
+      position: relative;
+      text-align: right;
+    }
+    td:before {
+      position: absolute;
+      top: 0.6rem;
+      left: 0.6rem;
+      width: 45%;
+      white-space: nowrap;
+      font-weight: 700;
+      text-align: left;
+      color: #34495e;
+      font-size: 0.85rem;
+    }
+    td:nth-of-type(1):before { content: "Material"; }
+    td:nth-of-type(2):before { content: "Quantidade"; }
+    td:nth-of-type(3):before { content: "Data"; }
+    td:nth-of-type(4):before { content: "Responsável"; }
+    td:nth-of-type(5):before { content: "Local/Obs"; }
+  }
+
+  /* Menu texto menor e icones */
+  .icon-label {
+    font-size: 0.7rem;
+  }
+
+  /* Scroll suave para navegação */
+  html {
+    scroll-behavior: smooth;
+  }
+</style>
+<style id="monica-reading-highlight-style">
+        .monica-reading-highlight {
+          animation: fadeInOut 1.5s ease-in-out;
+        }
+
+        @keyframes fadeInOut {
+          0%, 100% { background-color: transparent; }
+          30%, 70% { background-color: rgba(2, 118, 255, 0.20); }
+        }
+      </style></head>
+<body monica-id="ofpnmcalabcbjgholdjcjblkibolbppb" monica-version="7.9.4">
+<div id="app-container">
+
+  <!-- Tela de entrada / login -->
+  <div id="login-screen">
+    <div class="logo-container" aria-label="Logo SDM">
+      <span class="logo-text" aria-hidden="true">SDM</span>
+    </div>
+    <h1>SDM</h1>
+    <p>Sem Desperdício de Materiais</p>
+    <button id="btn-login" aria-label="Entrar no aplicativo">Entrar</button>
+  </div>
+
+  <!-- Aplicativo principal após login -->
+  <div id="main-app" style="display:none;">
+    <!-- Menu lateral -->
+    <nav id="side-menu" aria-label="Menu Principal">
+      <button id="btn-cadastro" class="active" aria-controls="cadastro-section" aria-selected="true" role="tab" tabindex="0" title="Cadastro de Materiais">
+        📥<span class="icon-label">Cadastro</span>
+      </button>
+      <button id="btn-uso" aria-controls="uso-section" aria-selected="false" role="tab" tabindex="-1" title="Registro de Uso">
+        🛠<span class="icon-label">Uso</span>
+      </button>
+      <button id="btn-estoque" aria-controls="estoque-section" aria-selected="false" role="tab" tabindex="-1" title="Estoque Atualizado">
+        📦<span class="icon-label">Estoque</span>
+      </button>
+      <button id="btn-relatorios" aria-controls="relatorios-section" aria-selected="false" role="tab" tabindex="-1" title="Relatórios">
+        📊<span class="icon-label">Relatórios</span>
+      </button>
+      <button id="btn-config" aria-controls="config-section" aria-selected="false" role="tab" tabindex="-1" title="Configurações">
+        ⚙<span class="icon-label">Config</span>
+      </button>
+    
+<button id="btn-calculo" aria-controls="calculo-section" aria-selected="false" role="tab" tabindex="-1" title="Cálculo de Materiais">
+  📐<span class="icon-label">Cálculo</span>
+</button>
+
+    </nav>
+
+    <!-- Conteúdo das abas -->
+    <main id="content-container">
+
+      <section id="cadastro-section" class="active" role="tabpanel" tabindex="0" aria-label="Cadastro de Materiais">
+        <h2>Cadastro de Materiais</h2>
+        <form id="form-cadastro">
+          <label for="material-nome">Nome do Material</label>
+          <input type="text" id="material-nome" name="nome" required="" maxlength="50" placeholder="Ex: Cimento">
+
+          <label for="material-foto">Foto do Material</label>
+          <input type="file" id="material-foto" name="foto" accept="image/*">
+
+          <label for="material-quantidade">Quantidade Recebida</label>
+          <input type="number" id="material-quantidade" name="quantidade" required="" min="1" placeholder="Ex: 100">
+
+          <label for="material-data">Data de Entrada</label>
+          <input type="date" id="material-data" name="dataEntrada" required="">
+
+          <label for="material-responsavel">Responsável pelo Recebimento</label>
+          <input type="text" id="material-responsavel" name="responsavelEntrada" required="" placeholder="Nome do responsável" maxlength="50">
+
+          <label for="material-local">Local da Obra</label>
+          <input type="text" id="material-local" name="localObra" required="" placeholder="Ex: Obra Centro" maxlength="100">
+
+          <button type="submit" class="primary">➕ Cadastrar Material</button>
+        </form>
+      </section>
+
+      <section id="uso-section" role="tabpanel" tabindex="0" aria-label="Registro de Uso de Materiais">
+        <h2>Registro de Uso de Materiais</h2>
+        <form id="form-uso">
+          <label for="uso-material">Material</label>
+          <select id="uso-material" name="material" required="">
+            <option value="">Selecione um material</option>
+          </select>
+
+          <label for="uso-quantidade">Quantidade Usada</label>
+          <input type="number" id="uso-quantidade" name="quantidade" required="" min="1" placeholder="Ex: 20">
+
+          <label for="uso-local">Onde Foi Usado</label>
+          <input type="text" id="uso-local" name="local" required="" placeholder="Local ou atividade" maxlength="100">
+
+          <label for="uso-responsavel">Responsável pelo Uso</label>
+          <input type="text" id="uso-responsavel" name="responsavel" required="" maxlength="50" placeholder="Nome do responsável">
+
+          <label for="uso-data">Data de Uso</label>
+          <input type="date" id="uso-data" name="dataUso" required="">
+
+          <button type="submit" class="primary">✅ Registrar Uso</button>
+        </form>
+      </section>
+
+      <section id="estoque-section" role="tabpanel" tabindex="0" aria-label="Estoque Atualizado">
+        <h2>Estoque Atualizado</h2>
+        <div id="alert-baixa-quantidade" aria-live="polite" class="alert" style="display:none;"></div>
+        <table aria-label="Tabela de materiais em estoque">
+          <thead>
+            <tr>
+              <th>Material</th>
+              <th>Quantidade Disponível</th>
+              <th>Local da Obra</th>
+              <th>Última Entrada</th>
+              <th>Último Uso</th>
+            </tr>
+          </thead>
+          <tbody id="estoque-tbody">
+          </tbody>
+        </table>
+        <h3>Histórico de Entrada e Saída</h3>
+        <table aria-label="Histórico de entradas e saídas">
+          <thead>
+            <tr>
+              <th>Material</th>
+              <th>Tipo</th>
+              <th>Quantidade</th>
+              <th>Data</th>
+              <th>Responsável</th>
+              <th>Local/Obs</th>
+            </tr>
+          </thead>
+          <tbody id="historico-tbody">
+          </tbody>
+        </table>
+      </section>
+
+      <section id="relatorios-section" role="tabpanel" tabindex="0" aria-label="Relatórios simples">
+        <h2>Relatórios</h2>
+        <button id="exportar-pdf" class="primary" title="Exportar Relatórios em PDF">📄 Exportar em PDF</button>
+
+        <h3>Resumo do Uso Semanal</h3>
+        <div id="relatorio-semanal"></div>
+
+        <h3>Materiais Mais Desperdiçados</h3>
+        <div id="relatorio-desperdicio"></div>
+
+        <h3>Comparação entre Entrada e Uso</h3>
+        <div id="relatorio-comparacao"></div>
+      </section>
+
+      <section id="config-section" role="tabpanel" tabindex="0" aria-label="Configurações do Usuário">
+        <h2>Configurações</h2>
+        <label for="usuario-role">Selecione o Perfil do Usuário:</label>
+        <select id="usuario-role">
+          <option value="administrador">Administrador (Engenheiro/Gestor)</option>
+          <option value="encarregado">Encarregado da Obra</option>
+          <option value="ajudante">Ajudante/Colaborador</option>
+        </select>
+        <p>Perfil atual: <span id="perfil-atual">Administrador</span></p>
+      </section>
+
+    
+<section id="calculo-section" role="tabpanel" tabindex="0" aria-label="Cálculo de Uso de Materiais">
+  <h2>Calculadora de Materiais</h2>
+  <form id="form-calculo">
+    <label for="calc-area">Área da Obra (em m²)</label>
+    <input type="number" id="calc-area" name="area" min="1" required placeholder="Ex: 50">
+
+    <label for="calc-material">Nome do Material</label>
+<input type="text" id="calc-material" name="material" required placeholder="Digite o nome, ex: cimento">
+
+
+    <button type="submit" class="primary">📏 Calcular</button>
+  </form>
+  <div id="calc-resultado" class="alert" style="display:none; margin-top:1rem;"></div>
+</section>
+
+    </main>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+  (function(){
+    const STORAGE_MATERIAIS = 'sdm_materiais';
+    const STORAGE_USOS = 'sdm_usos';
+    const STORAGE_USER_ROLE = 'sdm_user_role';
+
+    // Element refs
+    const loginScreen = document.getElementById('login-screen');
+    const btnLogin = document.getElementById('btn-login');
+    const mainApp = document.getElementById('main-app');
+
+    const sideMenu = document.getElementById('side-menu');
+    const menuButtons = {
+      
+      calculo: document.getElementById('btn-calculo'),
+
+      cadastro: document.getElementById('btn-cadastro'),
+      uso: document.getElementById('btn-uso'),
+      estoque: document.getElementById('btn-estoque'),
+      relatorios: document.getElementById('btn-relatorios'),
+      config: document.getElementById('btn-config'),
+    };
+
+    const sections = {
+      
+      calculo: document.getElementById('calculo-section'),
+
+      cadastro: document.getElementById('cadastro-section'),
+      uso: document.getElementById('uso-section'),
+      estoque: document.getElementById('estoque-section'),
+      relatorios: document.getElementById('relatorios-section'),
+      config: document.getElementById('config-section'),
+    };
+
+    const formCadastro = document.getElementById('form-cadastro');
+    const formUso = document.getElementById('form-uso');
+    const selectUsoMaterial = document.getElementById('uso-material');
+
+    const estoqueTBody = document.getElementById('estoque-tbody');
+    const historicoTBody = document.getElementById('historico-tbody');
+    const alertBaixaQuantidade = document.getElementById('alert-baixa-quantidade');
+
+    const resumoSemanalDiv = document.getElementById('relatorio-semanal');
+    const materiaisDesperdicioDiv = document.getElementById('relatorio-desperdicio');
+    const comparacaoDiv = document.getElementById('relatorio-comparacao');
+    const exportarPdfBtn = document.getElementById('exportar-pdf');
+
+    const usuarioRoleSelect = document.getElementById('usuario-role');
+    const perfilAtualSpan = document.getElementById('perfil-atual');
+
+    // Data
+    let materiais = [];
+    let usos = [];
+    let userRole = 'administrador';
+
+    // Utils
+    function saveToStorage() {
+      localStorage.setItem(STORAGE_MATERIAIS, JSON.stringify(materiais));
+      localStorage.setItem(STORAGE_USOS, JSON.stringify(usos));
+      localStorage.setItem(STORAGE_USER_ROLE, userRole);
+    }
+
+    function loadFromStorage() {
+      const m = localStorage.getItem(STORAGE_MATERIAIS);
+      const u = localStorage.getItem(STORAGE_USOS);
+      const r = localStorage.getItem(STORAGE_USER_ROLE);
+      if (m) materiais = JSON.parse(m);
+      if (u) usos = JSON.parse(u);
+      if (r) userRole = r;
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return '';
+      const d = new Date(dateStr);
+      if (isNaN(d)) return '';
+      return d.toLocaleDateString('pt-BR');
+    }
+
+    function getTodayISO() {
+      return new Date().toISOString().slice(0,10);
+    }
+
+    // Tab navigation
+    function setActiveTab(tab) {
+      for (const key in sections) {
+        if (key === tab) {
+          sections[key].classList.add('active');
+          menuButtons[key].classList.add('active');
+          menuButtons[key].setAttribute('aria-selected', 'true');
+          menuButtons[key].setAttribute('tabindex', '0');
+          sections[key].removeAttribute('hidden');
+          sections[key].focus();
+        } else {
+          sections[key].classList.remove('active');
+          menuButtons[key].classList.remove('active');
+          menuButtons[key].setAttribute('aria-selected', 'false');
+          menuButtons[key].setAttribute('tabindex', '-1');
+          sections[key].setAttribute('hidden', '');
+        }
+      }
+    }
+    // Initialize tab to cadastro by default
+    function initTabs() {
+      setActiveTab('cadastro');
+      // Add event listeners to menu buttons
+      Object.entries(menuButtons).forEach(([key, button]) => {
+        button.addEventListener('click', () => setActiveTab(key));
+      });
+    }
+
+    // Unique Ids
+    function generateId() {
+      return Date.now().toString(36) + Math.random().toString(36).slice(2);
+    }
+    // Image file to base64
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // Low stock alert
+    function checkLowStock() {
+      const ALERT_LIMIT = 20;
+      const lowStockMaterials = materiais.filter(m => m.quantidadeDisponivel <= ALERT_LIMIT);
+      if(lowStockMaterials.length > 0) {
+        alertBaixaQuantidade.innerHTML = '⚠️ Atenção! Quantidade baixa para: ' + lowStockMaterials.map(m => m.nome).join(', ');
+        alertBaixaQuantidade.style.display = 'block';
+      } else {
+        alertBaixaQuantidade.style.display = 'none';
+      }
+    }
+
+    // Atualiza tabela estoque e histórico
+    function refreshEstoqueAndHistorico() {
+      estoqueTBody.innerHTML = '';
+      materiais.forEach(m => {
+        const entradas = usos.filter(u => u.tipo === 'entrada' && u.materialId === m.id);
+        const usosHist = usos.filter(u => u.tipo === 'uso' && u.materialId === m.id);
+        const lastEntrada = entradas.length ? entradas.reduce((a,b) => a.data > b.data ? a : b).data : '';
+        const lastUso = usosHist.length ? usosHist.reduce((a,b) => a.data > b.data ? a : b).data : '';
+
+        estoqueTBody.innerHTML += `
+          <tr>
+            <td>${m.nome}</td>
+            <td>${m.quantidadeDisponivel}</td>
+            <td>${m.localObra}</td>
+            <td>${formatDate(lastEntrada)}</td>
+            <td>${formatDate(lastUso)}</td>
+          </tr>
+        `;
+      });
+
+      const sortedHistorico = usos.slice().sort((a,b) => new Date(b.data) - new Date(a.data));
+      historicoTBody.innerHTML = '';
+      sortedHistorico.forEach(r => {
+        const mat = materiais.find(m => m.id === r.materialId);
+        if(!mat) return;
+        historicoTBody.innerHTML += `
+          <tr>
+            <td>${mat.nome}</td>
+            <td>${r.tipo === 'entrada' ? 'Entrada' : 'Uso'}</td>
+            <td>${r.quantidade}</td>
+            <td>${formatDate(r.data)}</td>
+            <td>${r.responsavel}</td>
+            <td>${r.local}</td>
+          </tr>
+        `;
+      });
+      checkLowStock();
+    }
+
+    // Atualizar quantidades disponíveis
+    function atualizarQuantidadesDisponiveis() {
+      materiais.forEach(m => {
+        const totalEntrada = usos
+          .filter(u => u.materialId === m.id && u.tipo === 'entrada')
+          .reduce((s, u) => s + u.quantidade, 0);
+        const totalUso = usos
+          .filter(u => u.materialId === m.id && u.tipo === 'uso')
+          .reduce((s, u) => s + u.quantidade, 0);
+        m.quantidadeDisponivel = totalEntrada - totalUso;
+        if (m.quantidadeDisponivel < 0) m.quantidadeDisponivel = 0;
+      });
+    }
+
+    // Permissões baseadas em perfil
+    function atualizarPermissoes() {
+      if (userRole === 'administrador') {
+        enableElement(formCadastro, true);
+        enableElement(formUso, true);
+        exportarPdfBtn.disabled = false;
+      } else if (userRole === 'encarregado') {
+        enableElement(formCadastro, false);
+        enableElement(formUso, true);
+        exportarPdfBtn.disabled = false;
+      } else { // ajudante
+        enableElement(formCadastro, false);
+        enableElement(formUso, true);
+        exportarPdfBtn.disabled = true;
+      }
+      perfilAtualSpan.textContent = userRole.charAt(0).toUpperCase() + userRole.slice(1);
+    }
+
+    function enableElement(form, enable) {
+      Array.from(form.elements).forEach(el => el.disabled = !enable);
+      if (enable) {
+        form.querySelector('button[type="submit"]').disabled = false;
+      } else {
+        form.querySelector('button[type="submit"]').disabled = true;
+      }
+    }
+
+    // Relatório semanal
+    function gerarRelatorioSemanal() {
+      const semanal = {};
+      usos.filter(u => u.tipo === 'uso').forEach(u => {
+        const d = new Date(u.data);
+        if (isNaN(d)) return;
+        const year = d.getFullYear();
+        const week = getWeekNumber(d);
+        const key = `${year}-W${week}`;
+        if (!semanal[key]) semanal[key] = {};
+        if (!semanal[key][u.materialId]) semanal[key][u.materialId] = 0;
+        semanal[key][u.materialId] += u.quantidade;
+      });
+
+      let html = '<table><thead><tr><th>Semana</th><th>Material</th><th>Quantidade Usada</th></tr></thead><tbody>';
+      Object.entries(semanal).forEach(([sem, data]) => {
+        Object.entries(data).forEach(([matId, q]) => {
+          const mat = materiais.find(m => m.id === matId);
+          if(!mat) return;
+          html += `<tr><td>${sem}</td><td>${mat.nome}</td><td>${q}</td></tr>`;
+        });
+      });
+      html += '</tbody></table>';
+      resumoSemanalDiv.innerHTML = html;
+    }
+
+    function getWeekNumber(date) {
+      date = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+      const dayNum = date.getUTCDay() || 7;
+      date.setUTCDate(date.getUTCDate() + 4 - dayNum);
+      const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+      const week = Math.ceil((((date - yearStart) / 86400000) + 1) / 7);
+      return week;
+    }
+
+    // Materiais mais desperdiçados
+    function gerarRelatorioDesperdicio() {
+      const desperdicios = materiais.map(m => {
+        const totalEntrada = usos.filter(u => u.tipo==='entrada' && u.materialId===m.id).reduce((s,u) => s + u.quantidade, 0);
+        const totalUso = usos.filter(u => u.tipo==='uso' && u.materialId===m.id).reduce((s,u) => s + u.quantidade, 0);
+        const perda = totalEntrada - totalUso;
+        return { nome: m.nome, perda };
+      }).filter(d => d.perda < 0).sort((a, b) => a.perda - b.perda);
+
+      if (desperdicios.length === 0) {
+        materiaisDesperdicioDiv.innerHTML = '<p>Nenhum desperdício detectado.</p>';
+        return;
+      }
+
+      let html = '<ul>';
+      desperdicios.forEach(d => {
+        html += `<li>${d.nome}: perda estimada de ${Math.abs(d.perda).toFixed(2)}</li>`;
+      });
+      html += '</ul>';
+      materiaisDesperdicioDiv.innerHTML = html;
+    }
+
+    // Comparação entrada vs uso
+    function gerarRelatorioComparacao() {
+      let html = '<table><thead><tr><th>Material</th><th>Total Entrada</th><th>Total Uso</th><th>Saldo</th></tr></thead><tbody>';
+      materiais.forEach(m => {
+        const totalEntrada = usos.filter(u => u.tipo==='entrada' && u.materialId===m.id).reduce((s,u) => s + u.quantidade, 0);
+        const totalUso = usos.filter(u => u.tipo==='uso' && u.materialId===m.id).reduce((s,u) => s + u.quantidade, 0);
+        const saldo = totalEntrada - totalUso;
+        html += `<tr><td>${m.nome}</td><td>${totalEntrada}</td><td>${totalUso}</td><td>${saldo}</td></tr>`;
+      });
+      html += '</tbody></table>';
+      comparacaoDiv.innerHTML = html;
+    }
+
+    // Exportação PDF
+    async function exportarPdfRelatorios() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.setFontSize(18);
+      doc.text('Relatórios SDM – Sem Desperdício de Materiais', 10, 20);
+
+      doc.setFontSize(14);
+      doc.text('Resumo do Uso Semanal:', 10, 30);
+      let y = 36;
+      const maxRowsPerPage = 20;
+
+      let semanal = {};
+      usos.filter(u => u.tipo==='uso').forEach(u => {
+        const d = new Date(u.data);
+        if(isNaN(d)) return;
+        const year = d.getFullYear();
+        const week = getWeekNumber(d);
+        const key = `${year}-W${week}`;
+        if(!semanal[key]) semanal[key] = {};
+        if(!semanal[key][u.materialId]) semanal[key][u.materialId] = 0;
+        semanal[key][u.materialId] += u.quantidade;
+      });
+
+      let lineCount = 0;
+      doc.setFontSize(11);
+      for(const [sem,data] of Object.entries(semanal)) {
+        for(const [matId,q] of Object.entries(data)) {
+          const mat = materiais.find(m => m.id === matId);
+          if(!mat) continue;
+          if(lineCount >= maxRowsPerPage) {
+            doc.addPage();
+            lineCount = 0;
+          }
+          doc.text(`${sem} - ${mat.nome}: ${q}`, 10, 40 + lineCount*7);
+          lineCount++;
+        }
+      }
+      y += lineCount*7 + 10;
+
+      doc.addPage();
+      doc.setFontSize(14);
+      doc.text('Materiais Mais Desperdiçados:', 10, 20);
+      doc.setFontSize(11);
+
+      let desperdicios = materiais.map(m => {
+        const totalEntrada = usos.filter(u => u.tipo==='entrada' && u.materialId===m.id).reduce((s,u) => s + u.quantidade, 0);
+        const totalUso = usos.filter(u => u.tipo==='uso' && u.materialId===m.id).reduce((s,u) => s + u.quantidade, 0);
+        const perda = totalEntrada - totalUso;
+        return { nome: m.nome, perda };
+      }).filter(d => d.perda < 0).sort((a,b) => a.perda - b.perda);
+
+      if(desperdicios.length === 0) {
+        doc.text('Nenhum desperdício detectado.', 10, 30);
+      } else {
+        desperdicios.forEach((d,i) => {
+          if(i >= maxRowsPerPage) return;
+          doc.text(`${d.nome}: perda estimada de ${Math.abs(d.perda).toFixed(2)}`, 10, 30 + i*7);
+        });
+      }
+
+      doc.addPage();
+      doc.setFontSize(14);
+      doc.text('Comparação entre Entrada e Uso:', 10, 20);
+      doc.setFontSize(11);
+
+      materiais.forEach((m,i) => {
+        if(i >= maxRowsPerPage) return;
+        const totalEntrada = usos.filter(u => u.tipo==='entrada' && u.materialId===m.id).reduce((s,u) => s + u.quantidade, 0);
+        const totalUso = usos.filter(u => u.tipo==='uso' && u.materialId===m.id).reduce((s,u) => s + u.quantidade, 0);
+        const saldo = totalEntrada - totalUso;
+        const line = `${m.nome} - Entrada: ${totalEntrada}, Uso: ${totalUso}, Saldo: ${saldo}`;
+        doc.text(line, 10, 30 + i*7);
+      });
+
+      doc.save('Relatorios_SDM.pdf');
+    }
+
+    
+    const formCalculo = document.getElementById('form-calculo');
+    const resultadoCalculo = document.getElementById('calc-resultado');
+    const calcMaterialSelect = document.getElementById('calc-material');
+
+    formCalculo.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const area = parseFloat(formCalculo.area.value);
+      const tipo = formCalculo.material.value.toLowerCase().trim();
+
+
+      if (!area || area <= 0 || !tipo) {
+        resultadoCalculo.style.display = 'block';
+        resultadoCalculo.textContent = 'Informe área válida e selecione um material.';
+        return;
+      }
+
+      const taxas = {
+  "cimento": 0.03,
+  "areia": 0.05,
+  "pedra britada": 0.06,
+  "gesso": 3,
+  "água": 18,
+  "cal hidratada": 0.01,
+  "argamassa pronta": 8,
+  "concreto usinado": 0.13,
+  "rejunte": 0.2,
+  "piso cerâmico": 1.05,
+  "porcelanato": 1.05,
+  "massa corrida": 0.35,
+  "acrílica": 0.35,
+  "tijolos": 15,
+  "manta asfáltica": 1.05,
+  "aço": 5.5,
+  "vergalhão": 5.5,
+  "tinta": 0.25
+};
+
+      const taxa = taxas[tipo];
+      const total = (area * taxa).toFixed(2);
+      resultadoCalculo.style.display = 'block';
+      resultadoCalculo.textContent = `Você precisará de aproximadamente ${total} sacos de ${tipo}.`;
+
+      // Se material estiver cadastrado, comparar com estoque
+      const mat = materiais.find(m => m.nome.toLowerCase() === tipo);
+      if (mat) {
+        if (mat.quantidadeDisponivel < total) {
+          resultadoCalculo.textContent += ` ⚠️ Estoque insuficiente (disponível: ${mat.quantidadeDisponivel})`;
+        }
+      }
+    });
+
+    // Eventos
+
+    // Login
+    btnLogin.onclick = () => {
+      loginScreen.style.display = 'none';
+      mainApp.style.display = 'flex';
+      initTabs();
+      loadFromStorage();
+      populateUsoMaterialOptions();
+      atualizarQuantidadesDisponiveis();
+      refreshEstoqueAndHistorico();
+      gerarRelatorioSemanal();
+      gerarRelatorioDesperdicio();
+      gerarRelatorioComparacao();
+      atualizarPermissoes();
+      usuarioRoleSelect.value = userRole;
+    };
+
+    // Popula select de uso com materiais
+    function populateUsoMaterialOptions() {
+      selectUsoMaterial.innerHTML = '<option value="">Selecione um material</option>';
+      materiais.forEach(m => {
+        selectUsoMaterial.innerHTML += `<option value="${m.id}">${m.nome}</option>`;
+      });
+    }
+
+    // Formulário cadastro
+    formCadastro.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if(userRole !== 'administrador') {
+        alert('Você não tem permissão para cadastrar materiais.');
+        return;
+      }
+      const nome = formCadastro.nome.value.trim();
+      const quantidade = parseInt(formCadastro.quantidade.value);
+      const dataEntrada = formCadastro.dataEntrada.value;
+      const responsavelEntrada = formCadastro.responsavelEntrada.value.trim();
+      const localObra = formCadastro.localObra.value.trim();
+
+      let fotoBase64 = '';
+      if(formCadastro.foto.files.length > 0) {
+        try {
+          fotoBase64 = await fileToBase64(formCadastro.foto.files[0]);
+        } catch {
+          alert('Falha ao processar a foto.');
+          return;
+        }
+      }
+
+      if(!nome || !quantidade || !dataEntrada || !responsavelEntrada || !localObra) {
+        alert('Preencha todos os campos obrigatórios corretamente.');
+        return;
+      }
+
+      const materialId = generateId();
+      const material = { id: materialId, nome, foto: fotoBase64, localObra, quantidadeDisponivel: 0 };
+
+      materiais.push(material);
+      usos.push({
+        id: generateId(),
+        materialId,
+        tipo: 'entrada',
+        quantidade,
+        data: dataEntrada,
+        responsavel: responsavelEntrada,
+        local: localObra,
+      });
+
+      atualizarQuantidadesDisponiveis();
+      saveToStorage();
+      populateUsoMaterialOptions();
+      refreshEstoqueAndHistorico();
+      gerarRelatorioSemanal();
+      gerarRelatorioDesperdicio();
+      gerarRelatorioComparacao();
+      formCadastro.reset();
+      document.getElementById('material-data').value = getTodayISO();
+      alert('Material cadastrado com sucesso!');
+    });
+
+    // Formulário uso
+    formUso.addEventListener('submit', e => {
+      e.preventDefault();
+      if(userRole === 'ajudante' || userRole === 'encarregado' || userRole === 'administrador') {
+        const materialId = formUso.material.value;
+        const quantidade = parseInt(formUso.quantidade.value);
+        const local = formUso.local.value.trim();
+        const responsavel = formUso.responsavel.value.trim();
+        const data = formUso.dataUso.value;
+
+        if(!materialId || !quantidade || !local || !responsavel || !data) {
+          alert('Preencha todos os campos corretamente.');
+          return;
+        }
+
+        const material = materiais.find(m => m.id === materialId);
+        if(!material) {
+          alert('Material inválido.');
+          return;
+        }
+
+        if(quantidade > material.quantidadeDisponivel) {
+          if(!confirm(`Quantidade usada maior que o estoque disponível (${material.quantidadeDisponivel}). Confirmar registro?`)) {
+            return;
+          }
+        }
+
+        usos.push({
+          id: generateId(),
+          materialId,
+          tipo: 'uso',
+          quantidade,
+          data,
+          responsavel,
+          local,
+        });
+
+        atualizarQuantidadesDisponiveis();
+        saveToStorage();
+        refreshEstoqueAndHistorico();
+        gerarRelatorioSemanal();
+        gerarRelatorioDesperdicio();
+        gerarRelatorioComparacao();
+        formUso.reset();
+        document.getElementById('uso-data').value = getTodayISO();
+        alert('Uso registrado com sucesso!');
+      } else {
+        alert('Você não tem permissão para registrar uso.');
+      }
+    });
+
+    usuarioRoleSelect.addEventListener('change', e => {
+      userRole = e.target.value;
+      saveToStorage();
+      atualizarPermissoes();
+    });
+
+    exportarPdfBtn.addEventListener('click', () => exportarPdfRelatorios());
+
+  })();
+</script>
+
+
+
+<div id="monica-content-root" class="monica-widget" style="pointer-events: auto;"></div></body></html>
